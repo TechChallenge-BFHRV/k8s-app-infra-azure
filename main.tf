@@ -26,34 +26,34 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_api_gateway_rest_api" "example" {
+data "aws_api_gateway_rest_api" "example" {
   name = "techchallenge-api-gateway"
 }
 
 resource "aws_api_gateway_resource" "example" {
-  parent_id   = aws_api_gateway_rest_api.example.root_resource_id
+  parent_id   = data.aws_api_gateway_rest_api.example.root_resource_id
   path_part   = "retrieve"
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
 }
 
 resource "aws_api_gateway_resource" "create-user" {
-  parent_id   = aws_api_gateway_rest_api.example.root_resource_id
+  parent_id   = data.aws_api_gateway_rest_api.example.root_resource_id
   path_part   = "create"
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
 }
 
 resource "aws_api_gateway_method" "example" {
   authorization = "NONE"
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.example.id
-  rest_api_id   = aws_api_gateway_rest_api.example.id
+  rest_api_id   = data.aws_api_gateway_rest_api.example.id
 }
 
 resource "aws_api_gateway_method" "example2" {
   authorization = "NONE"
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.create-user.id
-  rest_api_id   = aws_api_gateway_rest_api.example.id
+  rest_api_id   = data.aws_api_gateway_rest_api.example.id
 }
 
 data "aws_lambda_function" "existing_lambda" {
@@ -72,7 +72,7 @@ output "lambda_arn2" {
 resource "aws_api_gateway_integration" "example" {
   http_method = aws_api_gateway_method.example.http_method
   resource_id = aws_api_gateway_resource.example.id
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
   integration_http_method = "POST"
   type        = "AWS_PROXY"
   uri = data.aws_lambda_function.existing_lambda.invoke_arn
@@ -81,14 +81,14 @@ resource "aws_api_gateway_integration" "example" {
 resource "aws_api_gateway_integration" "example2" {
   http_method = aws_api_gateway_method.example2.http_method
   resource_id = aws_api_gateway_resource.create-user.id
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
   integration_http_method = "POST"
   type        = "AWS_PROXY"
   uri = data.aws_lambda_function.existing_lambda2.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "example" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
 
   triggers = {
     # NOTE: The configuration below will satisfy ordering considerations,
@@ -112,7 +112,7 @@ resource "aws_api_gateway_deployment" "example" {
 
 resource "aws_api_gateway_stage" "example" {
   deployment_id = aws_api_gateway_deployment.example.id
-  rest_api_id   = aws_api_gateway_rest_api.example.id
+  rest_api_id   = data.aws_api_gateway_rest_api.example.id
   stage_name    = "dev"
 }
 

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techchallenge-k8s
+spec:
+  selector:
+    matchLabels:
+      app: techchallenge-k8s
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: techchallenge-k8s
+    spec:
+      containers:
+        - name: techchallenge-k8s
+          image: viniciusdeliz/techchallenge-k8s
+          ports: 
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
+          resources:
+            requests:
+              cpu: 1m

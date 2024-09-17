@@ -1,6 +1,6 @@
-## TechChallenge Azure AKS deployment
+## AWS API Gateway config and TechChallenge Azure AKS deployment
 
-You need to have the Azure CLI installed in your local environment.
+You need to have the Azure CLI installed in your local environment and also valid AWS credentials.
 
 1. Use your credentials to log in to your azure account with `az login`
 2. Ensure you're logged in requesting your AKS containers in Azure with: `az aks list`

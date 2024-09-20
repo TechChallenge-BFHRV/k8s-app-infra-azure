@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.0.0"
+    }
   }
 }
 
@@ -24,6 +28,13 @@ provider "azurerm" {
 
 provider "aws" {
   region = "us-east-1"
+}
+
+provider "kubernetes" {
+  host                   = azurerm_kubernetes_cluster.example.kube_config.0.host
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
 }
 
 data "aws_api_gateway_rest_api" "example" {
@@ -89,7 +100,7 @@ resource "aws_api_gateway_integration" "example2" {
 
 resource "aws_api_gateway_deployment" "example" {
   rest_api_id = data.aws_api_gateway_rest_api.example.id
-
+  depends_on  = [aws_api_gateway_integration.proxy_integration]
   triggers = {
     # NOTE: The configuration below will satisfy ordering considerations,
     #       but not pick up all future REST API changes. More advanced patterns
@@ -160,4 +171,170 @@ output "kube_config" {
   value = azurerm_kubernetes_cluster.example.kube_config_raw
 
   sensitive = true
+}
+
+resource "kubernetes_deployment" "postgres" {
+  metadata {
+    name = "postgres"
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "postgres"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "postgres"
+        }
+      }
+
+      spec {
+        container {
+          name  = "postgres"
+          image = "postgres:13"
+
+          port {
+            container_port = 5432
+          }
+
+          env {
+            name  = "POSTGRES_DB"
+            value = "techchallenge"
+          }
+
+          env {
+            name  = "POSTGRES_USER"
+            value = "docker"
+          }
+
+          env {
+            name  = "POSTGRES_PASSWORD"
+            value = "docker"
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "postgres" {
+  metadata {
+    name = "postgres"
+  }
+
+  spec {
+    selector = {
+      app = "postgres"
+    }
+
+    port {
+      port        = 5432
+      target_port = 5432
+    }
+
+    type = "NodePort"
+  }
+}
+
+
+resource "kubernetes_deployment" "techchallenge_k8s" {
+  metadata {
+    name = "techchallenge-k8s"
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "techchallenge-k8s"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "techchallenge-k8s"
+        }
+      }
+
+      spec {
+        container {
+          name  = "techchallenge-k8s"
+          image = "viniciusdeliz/techchallenge-k8s"
+
+          port {
+            container_port = 3000
+          }
+
+          env {
+            name  = "DATABASE_URL"
+            value = "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+resource "kubernetes_service" "techchallenge_k8s" {
+  metadata {
+    name = "techchallenge-k8s"
+  }
+
+  spec {
+    selector = {
+      app = "techchallenge-k8s"
+    }
+
+    port {
+      protocol    = "TCP"
+      port        = 3000
+      target_port = 3000
+    }
+
+    type = "LoadBalancer"
+  }
+}
+
+output "k8s_service_ip" {
+  value = kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip
+}
+
+resource "aws_api_gateway_resource" "nest-api" {
+  parent_id   = data.aws_api_gateway_rest_api.example.root_resource_id
+  path_part   = "{proxy+}"
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
+}
+
+resource "aws_api_gateway_method" "nest-get-method" {
+  rest_api_id   = data.aws_api_gateway_rest_api.example.id
+  resource_id   = aws_api_gateway_resource.nest-api.id
+  http_method   = "GET"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "proxy_integration" {
+  rest_api_id = data.aws_api_gateway_rest_api.example.id
+  resource_id = aws_api_gateway_resource.nest-api.id
+  http_method = aws_api_gateway_method.nest-get-method.http_method
+  type        = "HTTP_PROXY"
+  uri         = "http://${kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip}:3000/{proxy}"
+  integration_http_method = "GET"
+  cache_key_parameters = ["method.request.path.proxy"]
+  timeout_milliseconds = 29000
+  request_parameters = {
+    "integration.request.path.proxy" = "method.request.path.proxy"
+  }
 }

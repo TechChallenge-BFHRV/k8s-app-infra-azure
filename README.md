@@ -7,14 +7,10 @@ You need to have the Azure CLI installed in your local environment and also vali
 3. If you receive a successful response, continue, otherwise make sure you're connected to the Azure CLI
 4. Run `terraform apply`
 5. Wait patiently
-6. Run `echo "$(terraform output kube_config)" > ./azurek8s`
-7. Ensure your new `azurek8s` file does not have any "EOT" strings in it. If it does, remove the lines where they appear
-8. Run `export KUBECONFIG=./azurek8s`
-9. Run `kubectl get nodes` to ensure kubernetes is running properly on AKS. You should see a machine listed in your terminal with Ready STATUS.
-10. Run `kubectl apply -f k8s/postgres-deployment.yaml`
-11. Run `kubectl apply -f k8s/redis-deployment.yaml`
-12. Run `kubectl apply -f k8s/deployment.yaml`
-13. Run `kubectl apply -f k8s/service.yaml`
-14. Run `kubectl get services` and use the `EXTERNAL-IP` address of the `techchallenge-k8s LoadBalancer` in the following format: `http://external-ip-address:3000/docs` in your browser
-15. You are now accessing the cleanarch-techchallenge Swagger
-16. Run `terraform destroy` to shut down the infrastructure
+6. After "Apply complete!", look for the value k8s_service_ip in Outputs
+7. Application Swagger should be running in `http://<_k8s_service_ip_>:3000/docs`
+8. API Gateway should be ingesting inputs and hitting the Azure AKS app
+9. Run `terraform destroy` to shut down the infrastructure
+
+111. Run `kubectl apply -f k8s/redis-deployment.yaml` --> TODO Include redis deployment in terraform
+

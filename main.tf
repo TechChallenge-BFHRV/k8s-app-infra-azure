@@ -318,7 +318,7 @@ resource "aws_api_gateway_resource" "nest-api" {
 resource "aws_api_gateway_method" "nest-get-method" {
   rest_api_id   = data.aws_api_gateway_rest_api.example.id
   resource_id   = aws_api_gateway_resource.nest-api.id
-  http_method   = "GET"
+  http_method   = "ANY"
   authorization = "NONE"
   request_parameters = {
     "method.request.path.proxy" = true
@@ -331,7 +331,7 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   http_method = aws_api_gateway_method.nest-get-method.http_method
   type        = "HTTP_PROXY"
   uri         = "http://${kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip}:3000/{proxy}"
-  integration_http_method = "GET"
+  integration_http_method = "ANY"
   cache_key_parameters = ["method.request.path.proxy"]
   timeout_milliseconds = 29000
   request_parameters = {

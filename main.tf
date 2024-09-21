@@ -37,6 +37,8 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
 }
 
+data "aws_region" "current" {}
+
 data "aws_api_gateway_rest_api" "example" {
   name = "techchallenge-api-gateway"
 }
@@ -276,6 +278,11 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
           env {
             name  = "DATABASE_URL"
             value = "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
+          }
+
+          env {
+            name  = "API_GATEWAY_URL"
+            value = "`https://${data.aws_api_gateway_rest_api.example.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.example.stage_name}`"
           }
         }
       }

@@ -282,7 +282,7 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
 
           env {
             name  = "API_GATEWAY_URL"
-            value = "`https://${data.aws_api_gateway_rest_api.example.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.example.stage_name}`"
+            value = "https://${data.aws_api_gateway_rest_api.example.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.example.stage_name}"
           }
         }
       }

@@ -244,6 +244,9 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
+data "aws_db_instance" "database" {
+  db_instance_identifier = "postgres-db"
+}
 
 resource "kubernetes_deployment" "techchallenge_k8s" {
   metadata {
@@ -277,7 +280,7 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
+            value = "postgresql://dbadmin:teste123@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
           }
 
           env {

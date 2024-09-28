@@ -280,7 +280,7 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://dbadmin:teste123@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
+            value = "postgresql://docker:dockerTech@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
           }
 
           env {

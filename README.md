@@ -15,10 +15,10 @@ You need to have the Azure CLI installed in your local environment and also vali
 1. Use your credentials to log in to your azure account with `az login`
 2. Ensure you're logged in requesting your AKS containers in Azure with: `az aks list`
 3. If you receive a successful response, continue, otherwise make sure you're connected to the Azure CLI
-4. Run `terraform apply`
-5. Wait patiently
-6. After "Apply complete!", look for the value k8s_service_ip in Outputs
-7. Application Swagger should be running in `http://<_k8s_service_ip_>:3000/docs`
-8. API Gateway should be ingesting inputs and hitting the Azure AKS app
+4. Include the PostgreSQL database credentials using the commands `export TF_VAR_db_username="the-username"` and `export TF_VAR_db_password="the-password"`
+5. Run `terraform apply`
+6. Wait patiently
+7. After "Apply complete!", look for the value k8s_service_ip in Outputs
+8. Application Swagger should be running in `http://<_k8s_service_ip_>:3000/docs`, and the API Gateway should be ingesting inputs and hitting the Azure AKS app as expected
 9. Run `terraform destroy` to shut down the infrastructure
 

@@ -12,11 +12,16 @@ spec:
       labels:
         app: postgres
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: postgres
           image: postgres:13
           ports:
             - containerPort: 5432
+          resources:
+            limits:
+              ephemeral-storage: "2Gi"
+              memory: 100Mi
           env:
             - name: POSTGRES_DB
               value: techchallenge

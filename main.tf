@@ -1,5 +1,14 @@
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
+variable "db_username" {
+  description = "The database username"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "The database password"
+  type        = string
+  sensitive   = true
+}
 terraform {
   required_providers {
     azurerm = {
@@ -211,7 +220,7 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://docker:dockerTech@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
+            value = "postgresql://${var.db_username}:${var.db_password}@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
           }
 
           env {

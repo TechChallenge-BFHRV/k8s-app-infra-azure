@@ -12,14 +12,18 @@ spec:
       labels:
         app: techchallenge-k8s
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: techchallenge-k8s
           image: viniciusdeliz/techchallenge-k8s
           ports: 
             - containerPort: 3000
-          env:
-            - name: DATABASE_URL
-              value: "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
           resources:
             requests:
-              cpu: 1m
+              memory: "256Mi"
+              cpu: "250m"
+              ephemeral-storage: "512Mi"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+              ephemeral-storage: "8Gi"

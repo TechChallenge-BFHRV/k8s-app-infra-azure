@@ -15,7 +15,7 @@ You need to have the Azure CLI installed in your local environment and also vali
 1. Use your credentials to log in to your azure account with `az login`
 2. Ensure you're logged in requesting your AKS containers in Azure with: `az aks list`
 3. If you receive a successful response, continue, otherwise make sure you're connected to the Azure CLI
-4. Include the PostgreSQL database credentials using the commands `export TF_VAR_db_username="the-username"` and `export TF_VAR_db_password="the-password"`
+4. Include the PostgreSQL database credentials using the commands `export TF_VAR_db_username="the-username"` and `export TF_VAR_db_password="the-password"` or insert them when prompted in the step #5
 5. Run `terraform apply`
 6. Wait patiently
 7. After "Apply complete!", look for the value k8s_service_ip in Outputs

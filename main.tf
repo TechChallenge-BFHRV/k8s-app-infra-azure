@@ -212,10 +212,10 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
       spec {
         container {
           name  = "techchallenge-k8s"
-          image = "viniciusdeliz/techchallenge-k8s"
+          image = "viniciusdeliz/techchallenge-k8s:main"
 
           port {
-            container_port = 3000
+            container_port = 3001
           }
 
           env {
@@ -247,8 +247,8 @@ resource "kubernetes_service" "techchallenge_k8s" {
 
     port {
       protocol    = "TCP"
-      port        = 3000
-      target_port = 3000
+      port        = 3001
+      target_port = 3001
     }
 
     type = "LoadBalancer"
@@ -337,7 +337,7 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   resource_id = aws_api_gateway_resource.nest-api.id
   http_method = aws_api_gateway_method.nest-get-method.http_method
   type        = "HTTP_PROXY"
-  uri         = "http://${kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip}:3000/{proxy}"
+  uri         = "http://${kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip}:3001/{proxy}"
   integration_http_method = "ANY"
   cache_key_parameters = ["method.request.path.proxy"]
   timeout_milliseconds = 29000

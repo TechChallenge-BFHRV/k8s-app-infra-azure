@@ -161,7 +161,7 @@ resource "azurerm_kubernetes_cluster" "example" {
   default_node_pool {
     name       = "default"
     node_count = 1
-    vm_size    = "Standard_D2_v2"
+    vm_size    = "Standard_DS2_v2"
   }
 
   identity {
@@ -216,6 +216,15 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
 
           port {
             container_port = 3001
+          }
+          env {
+            name  = "ITEMS_SERVICE_HOST"
+            value = "techchallenge-items-microservice"
+          }
+
+          env {
+            name  = "ITEMS_SERVICE_PORT"
+            value = "3000"
           }
 
           env {

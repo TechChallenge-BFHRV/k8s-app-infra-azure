@@ -1,3 +1,15 @@
+variable "items-db_username" {
+  description = "The database username"
+  type        = string
+  sensitive   = true
+}
+
+variable "items-db_password" {
+  description = "The database password"
+  type        = string
+  sensitive   = true
+}
+
 # Kubernetes Deployment
 resource "kubernetes_deployment" "techchallenge_items_microservice" {
   metadata {
@@ -33,7 +45,7 @@ resource "kubernetes_deployment" "techchallenge_items_microservice" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://docker:docker@postgres:5432/techchallenge?schema=public"
+            value = "postgresql://${var.items-db_username}:${var.items-db_password}@postgres:5432/techchallenge?schema=public"
           }
 
           resources {

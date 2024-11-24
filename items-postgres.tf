@@ -151,6 +151,7 @@ resource "azurerm_managed_disk" "postgres_disk" {
   resource_group_name  = azurerm_resource_group.example.name
   storage_account_type = "Standard_LRS"
   disk_size_gb         = 1
+  public_network_access_enabled = false
   tags = {
     environment = azurerm_resource_group.example.name
   }

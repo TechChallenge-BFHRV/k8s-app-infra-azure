@@ -268,6 +268,63 @@ output "k8s_service_ip" {
   value = kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip
 }
 
+resource "kubernetes_deployment" "redis" {
+  metadata {
+    name = "redis"
+    labels = {
+      app = "redis"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "redis"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "redis"
+        }
+      }
+
+      spec {
+        container {
+          name  = "redis"
+          image = "redis:latest"
+
+          port {
+            container_port = 6379
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "redis" {
+  metadata {
+    name = "redis"
+  }
+
+  spec {
+    selector = {
+      app = "redis"
+    }
+
+    port {
+      port        = 6379
+      target_port = 6379
+    }
+
+    type = "ClusterIP"
+  }
+}
+
 resource "aws_api_gateway_resource" "nest-api" {
   parent_id   = data.aws_api_gateway_rest_api.example.root_resource_id
   path_part   = "{proxy+}"

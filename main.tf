@@ -65,14 +65,14 @@ resource "aws_api_gateway_resource" "create-user" {
 }
 
 resource "aws_api_gateway_method" "example" {
-  authorization = "NONE"
+  authorization = "AWS_IAM"
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.example.id
   rest_api_id   = data.aws_api_gateway_rest_api.example.id
 }
 
 resource "aws_api_gateway_method" "example2" {
-  authorization = "NONE"
+  authorization = "AWS_IAM"
   http_method   = "POST"
   resource_id   = aws_api_gateway_resource.create-user.id
   rest_api_id   = data.aws_api_gateway_rest_api.example.id
@@ -136,6 +136,7 @@ resource "aws_api_gateway_stage" "example" {
   deployment_id = aws_api_gateway_deployment.example.id
   rest_api_id   = data.aws_api_gateway_rest_api.example.id
   stage_name    = "dev"
+  xray_tracing_enabled = true
 }
 
 # Create a resource group
@@ -335,7 +336,7 @@ resource "aws_api_gateway_method" "nest-get-method" {
   rest_api_id   = data.aws_api_gateway_rest_api.example.id
   resource_id   = aws_api_gateway_resource.nest-api.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "AWS_IAM"
   request_parameters = {
     "method.request.path.proxy" = true
   }

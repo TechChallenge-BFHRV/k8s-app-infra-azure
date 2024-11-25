@@ -35,7 +35,7 @@ resource "kubernetes_deployment" "techchallenge_checkout_microservice" {
 
           env {
             name  = "MONGO_URI"
-            value = "mongodb+srv://root:UGteS3x3uYuxALkw@cluster0.6rrbo.mongodb.net/payment"
+            value = "${var.mongo_uri}"
           }
         }
       }

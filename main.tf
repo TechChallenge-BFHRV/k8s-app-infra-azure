@@ -1,14 +1,3 @@
-variable "db_username" {
-  description = "The database username"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_password" {
-  description = "The database password"
-  type        = string
-  sensitive   = true
-}
 terraform {
   required_providers {
     azurerm = {
@@ -226,6 +215,16 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
           env {
             name  = "ITEMS_SERVICE_PORT"
             value = "3000"
+          }
+
+          env {
+            name  = "CHECKOUT_SERVICE_HOST"
+            value = "techchallenge-checkout-microservice"
+          }
+
+          env {
+            name  = "CHECKOUT_SERVICE_PORT"
+            value = "3002"
           }
 
           env {

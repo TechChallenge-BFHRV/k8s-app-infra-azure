@@ -1,0 +1,5 @@
+mongo_uri = "mongodb+srv://root:UGteS3x3uYuxALkw@cluster0.6rrbo.mongodb.net/payment"
+items-db_password = "docker"
+items-db_username = "docker"
+db_username = "docker"
+db_password = "dockerTech"

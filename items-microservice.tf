@@ -1,15 +1,3 @@
-variable "items-db_username" {
-  description = "The database username"
-  type        = string
-  sensitive   = true
-}
-
-variable "items-db_password" {
-  description = "The database password"
-  type        = string
-  sensitive   = true
-}
-
 # Kubernetes Deployment
 resource "kubernetes_deployment" "techchallenge_items_microservice" {
   metadata {

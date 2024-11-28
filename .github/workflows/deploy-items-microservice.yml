@@ -1,0 +1,22 @@
+name: Deploy Microservice
+
+on:
+  workflow_dispatch: # Allows manual trigger if needed
+  repository_dispatch: # Triggered by events from other repositories
+    types:
+      - items-microservice-update
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Terraform Repo
+        uses: actions/checkout@v3
+
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.5
+
+      - name: Initialize Terraform
+        run: terraform init

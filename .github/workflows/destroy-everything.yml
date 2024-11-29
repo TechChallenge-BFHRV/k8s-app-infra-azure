@@ -1,4 +1,4 @@
-name: Deploy Application
+name: Destroy Application
 
 on:
   workflow_dispatch: # Allows manual trigger if needed

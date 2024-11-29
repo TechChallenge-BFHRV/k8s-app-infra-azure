@@ -13,6 +13,12 @@ terraform {
       version = ">= 2.0.0"
     }
   }
+
+  backend "s3" {
+    bucket = "techchallenge-4-nestapp-terraform-state"
+    key    = "state/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
 
 # Configure the Microsoft Azure Provider

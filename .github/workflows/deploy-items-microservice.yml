@@ -18,6 +18,10 @@ jobs:
         with:
           terraform_version: 1.9.5
 
+      - name: Create tfvars file
+        run: |
+          echo "${{ secrets.TF_VARS_CONTENT }}" > terraform.tfvars
+
       - name: Initialize Terraform
         run: terraform init
 

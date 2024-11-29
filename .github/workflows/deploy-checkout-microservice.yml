@@ -1,10 +1,10 @@
-name: Deploy Item Microservice
+name: Deploy Checkout Microservice
 
 on:
   workflow_dispatch: # Allows manual trigger if needed
   repository_dispatch: # Triggered by events from other repositories
     types:
-      - items-microservice-update
+      - checkout-microservice-update
 
 jobs:
   deploy:
@@ -45,7 +45,7 @@ jobs:
         run: terraform plan
 
       - name: Destroy Terraform
-        run: terraform destroy -target=module.items-microservice -auto-approve
+        run: terraform destroy -target=module.checkout-microservice -auto-approve
 
       - name: Apply Terraform
-        run: terraform apply -target=module.items-microservice -auto-approve
+        run: terraform apply -target=module.checkout-microservice -auto-approve

@@ -41,6 +41,11 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
 }
 
+module "checkout-microservice" {
+  source = "./modules/checkout-microservice"
+  mongo_uri = var.mongo_uri
+}
+
 module "items-microservice" {
   source = "./modules/items-microservice"
   items-db_username = var.items-db_username

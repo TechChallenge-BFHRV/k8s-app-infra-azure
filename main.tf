@@ -41,6 +41,16 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
 }
 
+module "items-microservice" {
+  source = "./modules/items-microservice"
+  items-db_username = var.items-db_username
+  items-db_password = var.items-db_password
+  resource_group_name = azurerm_resource_group.example.name
+  resource_group_location = azurerm_resource_group.example.location
+  kubernetes_cluster_name = azurerm_kubernetes_cluster.example.name
+  kubernetes_principal_id = azurerm_kubernetes_cluster.example.identity[0].principal_id
+}
+
 data "aws_region" "current" {}
 
 data "aws_api_gateway_rest_api" "example" {

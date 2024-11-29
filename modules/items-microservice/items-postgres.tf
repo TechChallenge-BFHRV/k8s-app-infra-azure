@@ -14,7 +14,7 @@ resource "kubernetes_storage_class" "premium" {
 resource "azurerm_role_assignment" "aks_disk_contributor" {
   scope                = azurerm_managed_disk.postgres_disk.id
   role_definition_name = "Contributor"
-  principal_id         = azurerm_kubernetes_cluster.example.identity[0].principal_id
+  principal_id         = var.kubernetes_principal_id
 }
 
 resource "kubernetes_persistent_volume" "postgres_pv" {
@@ -147,12 +147,12 @@ resource "kubernetes_service" "postgres" {
 resource "azurerm_managed_disk" "postgres_disk" {
   name                 = "postgres-disk"
   create_option        = "Empty"
-  location             = azurerm_resource_group.example.location
-  resource_group_name  = azurerm_resource_group.example.name
+  location             = var.resource_group_location
+  resource_group_name  = var.resource_group_name
   storage_account_type = "Standard_LRS"
   disk_size_gb         = 1
   public_network_access_enabled = false
   tags = {
-    environment = azurerm_resource_group.example.name
+    environment = var.resource_group_name
   }
 }

@@ -45,7 +45,7 @@ jobs:
         run: terraform plan
 
       - name: Destroy Terraform
-        run: terraform destroy -auto-approve
+        run: terraform destroy -target=module.items-microservice -auto-approve
 
       - name: Apply Terraform
-        run: terraform apply -auto-approve
+        run: terraform apply -target=module.items-microservice -auto-approve

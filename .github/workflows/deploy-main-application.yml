@@ -1,7 +1,10 @@
-name: Deploy Infrastructure and Applications
+name: Deploy Main Application
 
 on:
   workflow_dispatch: # Allows manual trigger if needed
+  repository_dispatch: # Triggered by events from other repositories
+    types:
+      - main-application-update
 
 jobs:
   deploy:
@@ -41,5 +44,8 @@ jobs:
       - name: Plan Terraform
         run: terraform plan
 
+      - name: Destroy Terraform
+        run: terraform destroy -target=module.main-application -auto-approve
+
       - name: Apply Terraform
-        run: terraform apply -auto-approve
+        run: terraform apply -target=module.main-application -auto-approve

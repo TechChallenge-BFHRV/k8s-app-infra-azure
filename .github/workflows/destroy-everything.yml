@@ -1,4 +1,4 @@
-name: Destroy Application
+name: Destroy Infrastructure and Applications
 
 on:
   workflow_dispatch: # Allows manual trigger if needed

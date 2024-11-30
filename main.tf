@@ -41,6 +41,16 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
 }
 
+module "main-application" {
+  source = "./modules/main-application"
+  db_password = var.db_password
+  db_username = var.db_username
+  aws_api_gateway_id = data.aws_api_gateway_rest_api.example.id
+  aws_region_name = data.aws_region.current.name
+  aws_api_gateway_stage_name = aws_api_gateway_stage.example.stage_name
+  aws_db_instance_addess = data.aws_db_instance.database.address
+}
+
 module "checkout-microservice" {
   source = "./modules/checkout-microservice"
   mongo_uri = var.mongo_uri
@@ -199,152 +209,7 @@ data "aws_db_instance" "database" {
   db_instance_identifier = "postgres-db"
 }
 
-resource "kubernetes_deployment" "techchallenge_k8s" {
-  metadata {
-    name = "techchallenge-k8s"
-  }
 
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels = {
-        app = "techchallenge-k8s"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "techchallenge-k8s"
-        }
-      }
-
-      spec {
-        container {
-          name  = "techchallenge-k8s"
-          image = "viniciusdeliz/techchallenge-k8s:main"
-
-          port {
-            container_port = 3001
-          }
-          env {
-            name  = "ITEMS_SERVICE_HOST"
-            value = "techchallenge-items-microservice"
-          }
-
-          env {
-            name  = "ITEMS_SERVICE_PORT"
-            value = "3000"
-          }
-
-          env {
-            name  = "CHECKOUT_SERVICE_HOST"
-            value = "techchallenge-checkout-microservice"
-          }
-
-          env {
-            name  = "CHECKOUT_SERVICE_PORT"
-            value = "3002"
-          }
-
-          env {
-            name  = "DATABASE_URL"
-            value = "postgresql://${var.db_username}:${var.db_password}@${data.aws_db_instance.database.address}:5432/techchallenge?schema=public"
-          }
-
-          env {
-            name  = "API_GATEWAY_URL"
-            value = "https://${data.aws_api_gateway_rest_api.example.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.example.stage_name}"
-          }
-        }
-      }
-    }
-  }
-}
-
-
-
-resource "kubernetes_service" "techchallenge_k8s" {
-  metadata {
-    name = "techchallenge-k8s"
-  }
-
-  spec {
-    selector = {
-      app = "techchallenge-k8s"
-    }
-
-    port {
-      protocol    = "TCP"
-      port        = 3001
-      target_port = 3001
-    }
-
-    type = "LoadBalancer"
-  }
-}
-
-output "k8s_service_ip" {
-  value = kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip
-}
-
-resource "kubernetes_deployment" "redis" {
-  metadata {
-    name = "redis"
-    labels = {
-      app = "redis"
-    }
-  }
-
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels = {
-        app = "redis"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "redis"
-        }
-      }
-
-      spec {
-        container {
-          name  = "redis"
-          image = "redis:latest"
-
-          port {
-            container_port = 6379
-          }
-        }
-      }
-    }
-  }
-}
-
-resource "kubernetes_service" "redis" {
-  metadata {
-    name = "redis"
-  }
-
-  spec {
-    selector = {
-      app = "redis"
-    }
-
-    port {
-      port        = 6379
-      target_port = 6379
-    }
-
-    type = "ClusterIP"
-  }
-}
 
 resource "aws_api_gateway_resource" "nest-api" {
   parent_id   = data.aws_api_gateway_rest_api.example.root_resource_id
@@ -367,11 +232,15 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   resource_id = aws_api_gateway_resource.nest-api.id
   http_method = aws_api_gateway_method.nest-get-method.http_method
   type        = "HTTP_PROXY"
-  uri         = "http://${kubernetes_service.techchallenge_k8s.status[0].load_balancer[0].ingress[0].ip}:3001/{proxy}"
+  uri         = "http://${module.main-application.k8s-main-app-service-public-address}:3001/{proxy}"
   integration_http_method = "ANY"
   cache_key_parameters = ["method.request.path.proxy"]
   timeout_milliseconds = 29000
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
   }
+}
+
+output "k8s_service_ip" {
+  value = module.main-application.k8s-main-app-service-public-address
 }

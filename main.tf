@@ -15,7 +15,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "techchallenge-4-nestapp-terraform-state"
+    bucket = "techchallenge-4-nestapp-terraform-state1"
     key    = "state/terraform.tfstate"
     region = "us-east-1"
   }

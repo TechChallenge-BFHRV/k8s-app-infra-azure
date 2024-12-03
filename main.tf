@@ -161,7 +161,7 @@ resource "aws_api_gateway_stage" "example" {
 
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "example-resource-techchallenge"
+  name     = "example-resource-techchallenge1"
   location = "Australia Central"
 }
 

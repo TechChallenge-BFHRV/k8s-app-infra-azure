@@ -15,7 +15,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "techchallenge-4-nestapp-terraform-state1"
+    bucket = "techchallenge-4-nestapp-terraform-state"
     key    = "state/terraform.tfstate"
     region = "us-east-1"
   }
@@ -161,7 +161,7 @@ resource "aws_api_gateway_stage" "example" {
 
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "example-resource-techchallenge1"
+  name     = "example-resource-techchallenge"
   location = "Australia Central"
 }
 

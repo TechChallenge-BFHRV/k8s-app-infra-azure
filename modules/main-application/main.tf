@@ -48,6 +48,16 @@ resource "kubernetes_deployment" "techchallenge_k8s" {
           }
 
           env {
+            name  = "ORDER_SERVICE_HOST"
+            value = "techchallenge-orders-microservice"
+          }
+
+          env {
+            name  = "ORDER_SERVICE_PORT"
+            value = "3003"
+          }
+
+          env {
             name  = "DATABASE_URL"
             value = "postgresql://${var.db_username}:${var.db_password}@${var.aws_db_instance_addess}:5432/techchallenge?schema=public"
           }

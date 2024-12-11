@@ -1,7 +1,7 @@
 # Create Storage Class
 resource "kubernetes_storage_class" "premium" {
   metadata {
-    name = "terraform-example"
+    name = "terraform-example-order-postgres"
   }
   storage_provisioner = "kubernetes.io/azure-disk"
   reclaim_policy     = "Retain"
@@ -19,7 +19,7 @@ resource "azurerm_role_assignment" "aks_disk_contributor" {
 
 resource "kubernetes_persistent_volume" "postgres_pv" {
   metadata {
-    name = "postgres-pv-items"
+    name = "postgres-pv-orders"
   }
   spec {
     capacity = {
@@ -41,7 +41,7 @@ resource "kubernetes_persistent_volume" "postgres_pv" {
 
 resource "kubernetes_persistent_volume_claim" "postgres_pvc" {
   metadata {
-    name      = "postgres-pvc-items"
+    name      = "postgres-pvc-orders"
   }
   spec {
     access_modes = ["ReadWriteOnce"]
@@ -57,16 +57,16 @@ resource "kubernetes_persistent_volume_claim" "postgres_pvc" {
 
 resource "kubernetes_deployment" "postgres" {
   metadata {
-    name      = "postgres"
+    name      = "order-database-db"
     labels = {
-      app = "postgres"
+      app = "order-database-db"
     }
   }
   spec {
     replicas = 1
     selector {
       match_labels = {
-        app = "postgres"
+        app = "order-database-db"
       }
     }
     strategy {
@@ -75,12 +75,12 @@ resource "kubernetes_deployment" "postgres" {
     template {
       metadata {
         labels = {
-          app = "postgres"
+          app = "order-database-db"
         }
       }
       spec {
         container {
-          name  = "postgres"
+          name  = "order-database-db"
           image = "postgres:14"
           port {
             container_port = 5432
@@ -99,7 +99,7 @@ resource "kubernetes_deployment" "postgres" {
           }
           env {
             name  = "POSTGRES_DB"
-            value = "techchallenge"
+            value = "orderdb"
           }
           resources {
             requests = {
@@ -130,11 +130,11 @@ resource "kubernetes_deployment" "postgres" {
 
 resource "kubernetes_service" "postgres" {
   metadata {
-    name      = "postgres"
+    name      = "order-database-db"
   }
   spec {
     selector = {
-      app = "postgres"
+      app = "order-database-db"
     }
     port {
       port        = 5432
@@ -145,7 +145,7 @@ resource "kubernetes_service" "postgres" {
 }
 
 resource "azurerm_managed_disk" "postgres_disk" {
-  name                 = "postgres-disk-items"
+  name                 = "postgres-disk-orders"
   create_option        = "Empty"
   location             = var.resource_group_location
   resource_group_name  = var.resource_group_name

@@ -66,6 +66,16 @@ module "items-microservice" {
   kubernetes_principal_id = azurerm_kubernetes_cluster.example.identity[0].principal_id
 }
 
+module "order-microservice" {
+  source = "./modules/order-microservice"
+  order-db_username = var.order-db_username
+  order-db_password = var.order-db_password
+  resource_group_name = azurerm_resource_group.example.name
+  resource_group_location = azurerm_resource_group.example.location
+  kubernetes_cluster_name = azurerm_kubernetes_cluster.example.name
+  kubernetes_principal_id = azurerm_kubernetes_cluster.example.identity[0].principal_id
+}
+
 data "aws_region" "current" {}
 
 data "aws_api_gateway_rest_api" "example" {
